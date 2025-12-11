@@ -1,0 +1,230 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct node
+{
+    int data;
+    struct node *prev;
+    struct node *next;
+} node;
+
+void insertion_beginning(node **head, int value)
+{
+    node *newNode = (node *)malloc(sizeof(node));
+    newNode->data = value;
+    newNode->prev = NULL;
+    newNode->next = *head;
+    if (*head != NULL)
+        (*head)->prev = newNode;
+    *head = newNode;
+}
+
+void insertion_end(node **head, int value)
+{
+    node *newNode = (node *)malloc(sizeof(node));
+    newNode->data = value;
+    newNode->next = NULL;
+    if (*head == NULL)
+    {
+        newNode->prev = NULL;
+        *head = newNode;
+        return;
+    }
+    node *temp = *head;
+    while (temp->next != NULL)
+        temp = temp->next;
+    temp->next = newNode;
+    newNode->prev = temp;
+}
+
+void insertion_before_node(node **head, int value, int number)
+{
+    node *temp = *head;
+    while (temp != NULL && temp->data != number)
+        temp = temp->next;
+    if (temp == NULL)
+        return;
+
+    node *newNode = (node *)malloc(sizeof(node));
+    newNode->data = value;
+    newNode->next = temp;
+    newNode->prev = temp->prev;
+
+    if (temp->prev != NULL)
+        temp->prev->next = newNode;
+    else
+        *head = newNode;
+
+    temp->prev = newNode;
+}
+
+void insertion_after_node(node **head, int value, int number)
+{
+    node *temp = *head;
+    while (temp != NULL && temp->data != number)
+        temp = temp->next;
+    if (temp == NULL)
+        return;
+
+    node *newNode = (node *)malloc(sizeof(node));
+    newNode->data = value;
+    newNode->prev = temp;
+    newNode->next = temp->next;
+
+    if (temp->next != NULL)
+        temp->next->prev = newNode;
+    temp->next = newNode;
+}
+
+int searching(node *head, int value)
+{
+    node *temp = head;
+    while (temp != NULL)
+    {
+        if (temp->data == value)
+            return 1;
+        temp = temp->next;
+    }
+    return 0;
+}
+
+void display(node *head)
+{
+    node *temp = head;
+    printf("Doubly Linked List: ");
+    while (temp != NULL)
+    {
+        printf("%d <-> ", temp->data);
+        temp = temp->next;
+    }
+    printf("NULL\n");
+}
+
+void delete(node **head, int position)
+{
+    if (*head == NULL)
+        return;
+
+    node *temp = *head;
+    for (int i = 1; temp != NULL && i < position; i++)
+        temp = temp->next;
+
+    if (temp == NULL)
+        return;
+
+    if (temp->prev != NULL)
+        temp->prev->next = temp->next;
+    else
+        *head = temp->next;
+
+    if (temp->next != NULL)
+        temp->next->prev = temp->prev;
+
+    free(temp);
+}
+
+void freeLinkedList(node **head)
+{
+    node *temp = *head;
+    while (temp != NULL)
+    {
+        node *next = temp->next;
+        free(temp);
+        temp = next;
+    }
+    *head = NULL;
+}
+
+int main()
+{
+    node *head = NULL;
+    int a, size, value, numb;
+
+    while (1)
+    {
+        printf("0. Create a doubly linked list\n");
+        printf("1. Display the linked list\n");
+        printf("2. Insert element before a node\n");
+        printf("3. Insert element after a node\n");
+        printf("4. Search for an element\n");
+        printf("5. Insertion at beginning\n");
+        printf("6. Insertion at end\n");
+        printf("7. Delete a node\n");
+        printf("8. Exit\n");
+        printf("Enter a number: ");
+        scanf("%d", &a);
+
+        switch (a)
+        {
+        case 0:
+            printf("Enter the size of linked list: ");
+            scanf("%d", &size);
+            for (int i = 0; i < size; i++)
+            {
+                printf("Value at node %d: ", i + 1);
+                scanf("%d", &value);
+                insertion_beginning(&head, value);
+            }
+            break;
+        case 1:
+            display(head);
+            break;
+        case 2:
+            printf("Insert before which number: ");
+            scanf("%d", &numb);
+            if (searching(head, numb))
+            {
+                printf("Enter the value: ");
+                scanf("%d", &value);
+                insertion_before_node(&head, value, numb);
+            }
+            else
+                printf("No such element exists in list\n");
+            break;
+        case 3:
+            printf("Enter the number to insert after: ");
+            scanf("%d", &numb);
+            if (searching(head, numb))
+            {
+                printf("Enter the value: ");
+                scanf("%d", &value);
+                insertion_after_node(&head, value, numb);
+            }
+            else
+                printf("No such element found in list\n");
+            break;
+        case 4:
+            printf("Searching for: ");
+            scanf("%d", &value);
+            if (searching(head, value))
+                printf("Element is in the list\n");
+            else
+                printf("Element is not in the list\n");
+            break;
+        case 5:
+            printf("Enter the value: ");
+            scanf("%d", &value);
+            insertion_beginning(&head, value);
+            break;
+        case 6:
+            printf("Enter the value: ");
+            scanf("%d", &value);
+            insertion_end(&head, value);
+            break;
+        case 7:
+            printf("Delete element number: ");
+            scanf("%d", &numb);
+            delete(&head, numb);
+            break;
+        case 8:
+            freeLinkedList(&head);
+            return 0;
+        default:
+            printf("Enter a valid number\n");
+            break;
+        }
+    }
+}
+
+// Time Complexity: Insertion, Deletion, Search O(n), Display O(n)
+// Space Complexity: O(1)

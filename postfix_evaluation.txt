@@ -1,0 +1,66 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+
+typedef struct Stack {
+    int top;
+    unsigned capacity;
+    int* array;
+} stack;
+
+stack* createStack(unsigned capacity) {
+    stack* stck = (stack*)malloc(sizeof(stack));
+    stck->capacity = capacity;
+    stck->top = -1;
+    stck->array = (int*)malloc(stck->capacity * sizeof(int));
+    return stck;
+}
+
+int isEmpty(stack* stack) {
+    return stack->top == -1;
+}
+
+void push(stack* stack, int item) {
+    stack->array[++stack->top] = item;
+}
+
+int pop(stack* stack) {
+    if (isEmpty(stack))
+        return -1;
+    return stack->array[stack->top--];
+}
+
+int evaluatePostfix(char* exp) {
+    stack* stack = createStack(strlen(exp));
+    int i = 0;
+
+    while (exp[i] != '\0') {
+        if (isdigit(exp[i]))
+            push(stack, exp[i] - '0');
+        else {
+            int operand2 = pop(stack);
+            int operand1 = pop(stack);
+            switch (exp[i]) {
+                case '+': push(stack, operand1 + operand2); break;
+                case '-': push(stack, operand1 - operand2); break;
+                case '*': push(stack, operand1 * operand2); break;
+                case '/': push(stack, operand1 / operand2); break;
+            }
+        }
+        i++;
+    }
+    return pop(stack);
+}
+
+int main() {
+    char exp[100];
+    printf("Enter a postfix expression: ");
+    scanf("%s", exp);
+    int result = evaluatePostfix(exp);
+    printf("Result: %d\n", result);
+    return 0;
+}
+
+// Time Complexity: O(n)
+// Space Complexity: O(n)

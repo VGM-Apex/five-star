@@ -1,0 +1,100 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define maxsize 10
+
+typedef struct queue {
+    int item[maxsize];
+    int front;
+    int rear;
+} queue;
+
+void initialize(queue *queue) {
+    queue->front = queue->rear = -1;
+}
+
+int is_full(queue *queue) {
+    return (queue->front == queue->rear + 1 || (queue->front == 0 && queue->rear == maxsize - 1));
+}
+
+void insert(queue *queue, int value) {
+    if (is_full(queue)) {
+        printf("Overflow error\n");
+        return;
+    }
+    if (queue->rear == maxsize - 1 && queue->front != 0) {
+        queue->rear = 0;
+        queue->item[queue->rear] = value;
+        return;
+    }
+    if (queue->front == -1 && queue->rear == -1) {
+        queue->front = queue->rear = 0;
+        queue->item[queue->rear] = value;
+    } else {
+        queue->rear++;
+        queue->item[queue->rear] = value;
+    }
+}
+
+void delete(queue *queue) {
+    if (queue->front == -1) {
+        printf("Queue is empty\n");
+        return;
+    }
+    if (queue->front == queue->rear) {
+        initialize(queue);
+    } else if (queue->front == maxsize - 1) {
+        queue->front = 0;
+    } else {
+        queue->front++;
+    }
+}
+
+void traverse(queue *queue) {
+    if (queue->front == -1) {
+        printf("Queue is empty.\n");
+        return;
+    }
+
+    int tempFront = queue->front;
+    if (queue->front <= queue->rear) {
+        while (tempFront <= queue->rear) {
+            printf("%d ", queue->item[tempFront]);
+            tempFront++;
+        }
+    } else {
+        while (tempFront < maxsize) {
+            printf("%d ", queue->item[tempFront]);
+            tempFront++;
+        }
+        tempFront = 0;
+        while (tempFront <= queue->rear) {
+            printf("%d ", queue->item[tempFront]);
+            tempFront++;
+        }
+    }
+    printf("\n");
+}
+
+int main() {
+    queue queue1;
+    initialize(&queue1);
+    int i = 0;
+
+    while (i < maxsize) {
+        int val;
+        printf("Enter element: ");
+        scanf("%d", &val);
+        insert(&queue1, val);
+        i++;
+    }
+
+    traverse(&queue1);
+    delete(&queue1);
+    traverse(&queue1);
+
+    return 0;
+}
+
+// Time Complexity: Insertion O(1), Deletion O(1), Traversal O(n)
+// Space Complexity: O(maxsize)
